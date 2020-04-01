@@ -45,6 +45,7 @@ def persist_to_file(filename, key=lambda *params: params):
             except (IOError, ValueError):
                 # print('File not found')
                 cache = {}
+                pickle.dump(cache, open(thisfilename, 'wb'))
 
             if paramskey not in cache:
                 # print('File found, but key not found. Available keys:', list(cache.keys()))
@@ -80,7 +81,7 @@ def persist_iterator_to_file(filename):
                         except EOFError:
                             break
 
-            except (IOError, ValueError):
+            except (IOError, ValueError, EOFError):
                 # Save the whole iterator first.
                 with open(filename.format(*params), 'wb') as f:
                     # Save params as a check that the file is actually correct
@@ -115,7 +116,7 @@ def persist_iterator_to_file_strparams(filename):
                         except EOFError:
                             break
 
-            except (IOError, ValueError):
+            except (IOError, ValueError, EOFError):
                 # Save the whole iterator first.
                 with open(filename.format(*params), 'wb') as f:
                     # Save params as a check that the file is actually correct

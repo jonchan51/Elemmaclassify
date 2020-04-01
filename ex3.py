@@ -163,7 +163,7 @@ for batchsize in [16]:#, 64, 256:
                                     0.999,
                                     0))
 
-recnet_experiments = recnet_experiments # take all
+recnet_experiments = datautils.shuffle_by_hash(recnet_experiments)[:40]
 
 experiments = model_experiments + adam_experiments + round2_experiments + recnet_experiments
 

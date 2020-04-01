@@ -313,7 +313,7 @@ def train(
 
             target = torch.tensor([1. if y else 0. for y in batchy])
             errloss, regloss = loss_func(preds, target)
-            errloss.backward()
+            errloss.backward(retain_graph=True)
 
             for param in model.parameters():
                 param.grad.data *= len(preds)
