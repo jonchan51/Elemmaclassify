@@ -56,7 +56,8 @@ def convert_to_datapoints(problemlemmas, usefulness):
 @functools.lru_cache(maxsize=1)
 def get_dataset():
     usefulness = get_usefulness()
-    train, crossval, test = datautils.split_by_amount(get_problemslemmas(), [0.8, 0.9], lambda x: x)
+    train, crossval, test = datautils.split_by_amount(
+            datautils.shuffle_by_hash(get_problemslemmas(), key=lambda x: str(x[:2])), [0.8, 0.9], lambda x: x)
     train_pos, train_neg = datautils.split_by_criteria(train, [lambda x: usefulness[x[0]][x[1]] < 1])
     crossval_pos, crossval_neg = datautils.split_by_criteria(crossval, [lambda x: usefulness[x[0]][x[1]] < 1])
     test_pos, test_neg = datautils.split_by_criteria(test, [lambda x: usefulness[x[0]][x[1]] < 1])
