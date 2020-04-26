@@ -931,6 +931,9 @@ class LSTreeM(HRRTorch):
             top, _, _ = parent.partition(':')
             parentvec = self.get_ground_vector(parent)
 
+            if specifier.startswith('esk'):
+                label = 'skolem_constant'
+
             rs = np.random.RandomState(
                     zlib.adler32(
                         (str(self.hrr_size)+label).encode('utf-8')
