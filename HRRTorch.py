@@ -842,25 +842,33 @@ class LSTreeM(HRRTorch):
                 )
 
         self.varmodel = torch.nn.Sequential(
-            torch.nn.Linear(hrr_size*2, hrr_size, True),
+            torch.nn.Linear(hrr_size*2, hrr_size*3, True),
+            torch.nn.Sigmoid(),
+            torch.nn.Linear(hrr_size*3, hrr_size, True),
             torch.nn.Sigmoid()
             )
         self.constmodel = torch.nn.Sequential(
-            torch.nn.Linear(hrr_size*2, hrr_size, True),
+            torch.nn.Linear(hrr_size*2, hrr_size*3, True),
+            torch.nn.Sigmoid(),
+            torch.nn.Linear(hrr_size*3, hrr_size, True),
             torch.nn.Sigmoid()
             )
         self.distmodel = torch.nn.Sequential(
-            torch.nn.Linear(hrr_size*2, hrr_size, True),
+            torch.nn.Linear(hrr_size*2, hrr_size*3, True),
+            torch.nn.Sigmoid(),
+            torch.nn.Linear(hrr_size*3, hrr_size, True),
             torch.nn.Sigmoid()
             )
 
-        self.funcmodel = torch.nn.LSTM(hrr_size, hrr_size, 1, True)
+        self.funcmodel = torch.nn.LSTM(hrr_size, hrr_size, 2, True)
         self.eqmodel = torch.nn.Sequential(
-            torch.nn.Linear(hrr_size*3 + 1, hrr_size, True),
+            torch.nn.Linear(hrr_size*3 + 1, hrr_size*4, True),
+            torch.nn.Sigmoid(),
+            torch.nn.Linear(hrr_size*4, hrr_size, True),
             torch.nn.Sigmoid()
             )
-        self.disjmodel = torch.nn.LSTM(hrr_size, hrr_size, 1, True)
-        self.conjmodel = torch.nn.LSTM(hrr_size, hrr_size, 1, True)
+        self.disjmodel = torch.nn.LSTM(hrr_size, hrr_size, 2, True)
+        self.conjmodel = torch.nn.LSTM(hrr_size, hrr_size, 2, True)
 
         fixed_encodings = dict()
         specifier_covariances = dict()
@@ -930,9 +938,6 @@ class LSTreeM(HRRTorch):
             parent, _, specifier = label.rpartition(':')
             top, _, _ = parent.partition(':')
             parentvec = self.get_ground_vector(parent)
-
-            if specifier.startswith('esk'):
-                label = 'skolem_constant'
 
             rs = np.random.RandomState(
                     zlib.adler32(
@@ -1008,6 +1013,12 @@ class LSTreeM(HRRTorch):
     def func(self, init_repr, name, vecs):
         """ Output a HRR vector given function name and HRR vectors of its inputs """
         arity = len(vecs)
+        
+        if name.startswith('esk'):
+            name = 'skolem_constant'
+        else:
+            name = 'theory_constant'
+
         funcrandomness = self.get_ground_vector(
                 '!Func:{}:{}-Func-{}'
                 .format(arity, name, arity))
